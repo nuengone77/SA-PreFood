@@ -1,0 +1,269 @@
+import 'package:flutter/material.dart';
+
+import '../models/models.dart';
+import '../theme/app_theme.dart';
+
+class BrandMark extends StatelessWidget {
+  const BrandMark({super.key, this.size = 74});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(size * .3),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1A9E582F),
+            blurRadius: 24,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Icon(
+        Icons.restaurant_rounded,
+        color: AppColors.orange,
+        size: size * .52,
+      ),
+    );
+  }
+}
+
+class PageIntro extends StatelessWidget {
+  const PageIntro({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.trailing,
+  });
+  final String title;
+  final String subtitle;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.muted),
+              ),
+            ],
+          ),
+        ),
+        ...switch (trailing) {
+          null => const <Widget>[],
+          final widget => <Widget>[widget],
+        },
+      ],
+    );
+  }
+}
+
+class EmojiVisual extends StatelessWidget {
+  const EmojiVisual({
+    super.key,
+    required this.emoji,
+    required this.color,
+    this.height = 116,
+    this.width,
+  });
+  final String emoji;
+  final Color color;
+  final double height;
+  final double? width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color, color.withValues(alpha: .62)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      alignment: Alignment.center,
+      child: Text(emoji, style: TextStyle(fontSize: height * .46)),
+    );
+  }
+}
+
+class StatusPill extends StatelessWidget {
+  const StatusPill({super.key, required this.label, required this.color});
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .12),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class EmptyState extends StatelessWidget {
+  const EmptyState({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(22),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 44, color: AppColors.orange),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.muted),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OrderSummaryCard extends StatelessWidget {
+  const OrderSummaryCard({
+    super.key,
+    required this.order,
+    this.actions = const [],
+  });
+  final MockOrder order;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    order.id,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                StatusPill(label: order.stage.label, color: order.stage.color),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              order.shopName,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 4),
+            Text(order.items, style: const TextStyle(color: AppColors.muted)),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(height: 1),
+            ),
+            Row(
+              children: [
+                const Icon(
+                  Icons.schedule_rounded,
+                  size: 18,
+                  color: AppColors.muted,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  order.pickupTime,
+                  style: const TextStyle(color: AppColors.muted),
+                ),
+                const Spacer(),
+                Text(
+                  '฿${order.total.toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 17,
+                  ),
+                ),
+              ],
+            ),
+            if (actions.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Row(
+                children: actions
+                    .map(
+                      (e) => Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: e,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

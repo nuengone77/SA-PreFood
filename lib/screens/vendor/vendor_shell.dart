@@ -1,0 +1,104 @@
+import 'package:flutter/material.dart';
+
+import '../../theme/app_theme.dart';
+import 'dashboard_screen.dart';
+import 'manage_menu_screen.dart';
+import 'shop_profile_screen.dart';
+import 'vendor_orders_screen.dart';
+
+class VendorShell extends StatefulWidget {
+  const VendorShell({super.key});
+
+  @override
+  State<VendorShell> createState() => _VendorShellState();
+}
+
+class _VendorShellState extends State<VendorShell> {
+  int _index = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final pages = [
+      VendorDashboardScreen(onViewOrders: () => setState(() => _index = 1)),
+      const VendorOrdersScreen(),
+      const ManageMenuScreen(),
+    ];
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: AppColors.orange.withValues(alpha: .14),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.storefront_rounded,
+                color: AppColors.orange,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'ครัวป้าแดง',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                ),
+                Text(
+                  'โหมดร้านค้า',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.muted,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            tooltip: 'โปรไฟล์ร้าน',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ShopProfileScreen()),
+            ),
+            icon: const Icon(Icons.account_circle_outlined),
+          ),
+          const SizedBox(width: 6),
+        ],
+      ),
+      body: IndexedStack(index: _index, children: pages),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (value) => setState(() => _index = value),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.space_dashboard_outlined),
+            selectedIcon: Icon(Icons.space_dashboard_rounded),
+            label: 'แดชบอร์ด',
+          ),
+          NavigationDestination(
+            icon: Badge(
+              label: Text('1'),
+              child: Icon(Icons.receipt_long_outlined),
+            ),
+            selectedIcon: Badge(
+              label: Text('1'),
+              child: Icon(Icons.receipt_long_rounded),
+            ),
+            label: 'ออเดอร์',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.restaurant_menu_outlined),
+            selectedIcon: Icon(Icons.restaurant_menu_rounded),
+            label: 'เมนู',
+          ),
+        ],
+      ),
+    );
+  }
+}
