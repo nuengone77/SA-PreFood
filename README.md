@@ -1,17 +1,143 @@
-# prefood
+# PreFood
 
-A new Flutter project.
+PreFood คือแอปพลิเคชันสำหรับสั่งอาหารล่วงหน้าในโรงอาหาร พัฒนาด้วย Flutter เพื่อช่วยลดเวลารอคิวในช่วงเวลาพัก ผู้ใช้สามารถเลือกร้านและเมนู กำหนดเวลารับอาหาร และติดตามสถานะออเดอร์ก่อนเดินทางไปรับที่ร้านได้
 
-## Getting Started
+โปรเจกต์นี้จัดทำขึ้นสำหรับวิชา **System Analysis and Design** โดยปัจจุบันเป็น UI/UX Prototype ที่เน้นการสาธิตโครงสร้างหน้าจอและขั้นตอนการใช้งาน ยังไม่มีการเชื่อมต่อระบบ Backend หรือฐานข้อมูลจริง
 
-This project is a starting point for a Flutter application.
+## แนวคิดของระบบ
 
-A few resources to get you started if this is your first Flutter project:
+ระบบแบ่งผู้ใช้งานออกเป็น 3 บทบาท:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+| บทบาท | ความสามารถหลัก |
+| --- | --- |
+| ลูกค้า | ค้นหาร้าน เลือกเมนู จัดการตะกร้า เลือกเวลารับอาหาร และติดตามสถานะออเดอร์ |
+| ร้านค้า | ดูภาพรวมร้าน รับหรือปฏิเสธออเดอร์ อัปเดตสถานะอาหาร และจัดการเมนู |
+| ผู้ดูแลระบบ | ดูข้อมูลภาพรวม จัดการร้านค้าและผู้ใช้ รวมถึงดูรายงานยอดขาย |
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ฟีเจอร์ที่มีใน Prototype
+
+### ระบบผู้ใช้งาน
+
+- หน้า Welcome, Login และ Register
+- เลือกเข้าสู่ระบบในฐานะลูกค้า ร้านค้า หรือผู้ดูแลระบบ
+- ใช้ข้อมูลจำลอง จึงสามารถกดเข้าสู่ระบบได้โดยไม่ต้องกรอกบัญชีจริง
+
+### ฝั่งลูกค้า
+
+- ค้นหาและกรองร้านค้าตามหมวดหมู่
+- ดูรายละเอียดร้านและรายการอาหาร
+- เพิ่ม ลด และลบสินค้าในตะกร้า
+- เลือกเวลารับอาหารและยืนยันออเดอร์
+- จำลองการเปลี่ยนสถานะออเดอร์
+- ดูประวัติการสั่งซื้อและข้อมูลโปรไฟล์
+
+### ฝั่งร้านค้า
+
+- Dashboard สรุปจำนวนออเดอร์และยอดขาย
+- รับ ปฏิเสธ และอัปเดตสถานะออเดอร์
+- เปิดหรือปิดขายเมนู
+- เพิ่ม แก้ไข และลบรายการอาหาร
+- ตั้งค่าสถานะเปิดหรือปิดร้าน
+
+### ฝั่งผู้ดูแลระบบ
+
+- Dashboard แสดงจำนวนผู้ใช้ ร้านค้า ออเดอร์ และยอดขายรวม
+- อนุมัติ เปิดใช้งาน หรือระงับร้านค้า
+- เปิดใช้งานหรือระงับบัญชีผู้ใช้
+- ดูกราฟยอดขายและอันดับร้านค้ายอดนิยม
+
+## เทคโนโลยีที่ใช้
+
+- Flutter และ Dart
+- Material Design 3
+- Navigator สำหรับการเปลี่ยนหน้าจอ
+- `setState` สำหรับ interaction ภายใน Prototype
+- Mock data ที่เขียนไว้ภายในโปรเจกต์
+
+โปรเจกต์นี้ไม่ใช้ package หรือบริการภายนอกสำหรับ Backend
+
+## โครงสร้างโปรเจกต์
+
+```text
+lib/
+├── main.dart
+├── mock_data.dart
+├── models/
+│   └── models.dart
+├── screens/
+│   ├── auth/
+│   ├── customer/
+│   ├── vendor/
+│   └── admin/
+├── theme/
+│   └── app_theme.dart
+└── widgets/
+    └── common_widgets.dart
+```
+
+## วิธีติดตั้งและรัน
+
+ตรวจสอบก่อนว่าเครื่องติดตั้ง Flutter SDK และมี Emulator หรือ Simulator พร้อมใช้งานแล้ว
+
+```bash
+flutter pub get
+flutter run
+```
+
+หากต้องการเลือกอุปกรณ์:
+
+```bash
+flutter devices
+flutter run -d <device-id>
+```
+
+สำหรับ iOS Simulator สามารถเปิด Simulator ก่อนแล้วจึงรัน:
+
+```bash
+open -a Simulator
+flutter run
+```
+
+## การตรวจสอบโปรเจกต์
+
+ตรวจสอบคุณภาพโค้ด:
+
+```bash
+flutter analyze
+```
+
+รัน Widget Tests:
+
+```bash
+flutter test
+```
+
+สร้าง Web Release Build:
+
+```bash
+flutter build web --release
+```
+
+## ขอบเขตปัจจุบัน
+
+ข้อมูลทั้งหมดในแอปเป็นข้อมูลจำลองและจะกลับสู่ค่าเริ่มต้นเมื่อเริ่มแอปใหม่ โดย Prototype นี้ยังไม่รองรับ:
+
+- Authentication จริง
+- Firebase, API หรือฐานข้อมูลจริง
+- ระบบชำระเงิน
+- การแจ้งเตือนแบบ Push Notification
+- การติดตามสถานะแบบ Real-time
+- การอัปโหลดและจัดเก็บรูปภาพจริง
+
+## แนวทางพัฒนาต่อ
+
+- เชื่อมต่อ Firebase Authentication และ Firestore
+- เพิ่มระบบจัดเก็บรูปภาพเมนู
+- เชื่อมข้อมูลลูกค้า ร้านค้า และออเดอร์เข้ากับ Backend
+- เพิ่มระบบแจ้งเตือนเมื่อร้านรับออเดอร์หรืออาหารพร้อม
+- เพิ่มการชำระเงินและสร้าง QR Code สำหรับรับอาหาร
+- เพิ่ม Unit, Widget และ Integration Tests สำหรับขั้นตอนสำคัญ
+
+---
+
+**PreFood — สั่งก่อน อร่อยได้ตรงเวลา**
