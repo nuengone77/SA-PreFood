@@ -5,9 +5,15 @@ import '../../widgets/common_widgets.dart';
 import '../auth/splash_screen.dart';
 
 /// หน้าโปรไฟล์ลูกค้า แสดงข้อมูลบัญชีและเมนูตั้งค่าตัวอย่าง
-class CustomerProfileScreen extends StatelessWidget {
+class CustomerProfileScreen extends StatefulWidget {
   const CustomerProfileScreen({super.key});
 
+  @override
+  State<CustomerProfileScreen> createState() => _CustomerProfileScreenState();
+}
+
+class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
+    bool _notificationsEnabled = true;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -51,7 +57,7 @@ class CustomerProfileScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'thanakorn@university.ac.th',
+                          'thanakornj67@nu.ac.th',
                           style: TextStyle(color: AppColors.muted),
                         ),
                         SizedBox(height: 3),
@@ -86,8 +92,18 @@ class CustomerProfileScreen extends StatelessWidget {
                 _ProfileTile(
                   icon: Icons.notifications_none_rounded,
                   title: 'การแจ้งเตือน',
-                  trailing: Switch(value: true, onChanged: (_) {}),
-                  onTap: () {},
+                  trailing: Switch(
+                    value: _notificationsEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _notificationsEnabled = value;
+                      });
+                    }),
+                  onTap: () {
+                    setState(() {
+                      _notificationsEnabled = !_notificationsEnabled;
+                    });
+                  },
                 ),
                 const Divider(height: 1, indent: 60),
                 _ProfileTile(
