@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 
+/// ฟอร์มสมัครสมาชิกแบบ mock รองรับทั้งลูกค้าและร้านค้า
+/// เมื่อเลือกบทบาทร้านค้า ระบบจะแสดงช่องชื่อร้านและประเภทอาหารเพิ่มขึ้น
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key, this.initialRole = AppRole.customer});
   final AppRole initialRole;
@@ -12,11 +14,13 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  // เก็บบทบาทปัจจุบันเพื่อสลับชุดช่องกรอกข้อมูลด้วย setState
   late AppRole _role;
 
   @override
   void initState() {
     super.initState();
+    // Admin ไม่มีขั้นตอนสมัครสมาชิก จึง fallback เป็นลูกค้าหากถูกส่งเข้ามา
     _role = widget.initialRole == AppRole.admin
         ? AppRole.customer
         : widget.initialRole;

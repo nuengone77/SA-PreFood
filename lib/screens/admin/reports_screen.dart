@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 
+/// หน้ารายงาน แสดงยอดขาย กราฟแท่ง และอันดับร้านค้าจากข้อมูลจำลอง
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
 
@@ -10,10 +11,12 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
+  // ช่วงเวลาที่เลือกใช้สลับตัวเลขยอดขายระหว่าง 7 และ 30 วัน
   String _period = '7 วัน';
 
   @override
   Widget build(BuildContext context) {
+    // ความสูงแบบสัดส่วนของแท่งกราฟและชื่อวัน ไม่ต้องใช้ chart dependency
     const sales = [.42, .62, .51, .88, .7, 1.0, .79];
     const days = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.'];
     return ListView(
@@ -172,6 +175,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 }
 
+/// แถวอันดับร้านค้า แสดงลำดับ จำนวนออเดอร์ และยอดขาย
 class _RankTile extends StatelessWidget {
   const _RankTile({
     required this.rank,

@@ -8,6 +8,8 @@ import 'manage_users_screen.dart';
 import 'manage_vendors_screen.dart';
 import 'reports_screen.dart';
 
+/// โครงหน้าหลักของผู้ดูแลระบบ ใช้ Navigation Drawer แทน Bottom Navigation
+/// เพื่อรองรับเมนูจัดการหลายหมวดหมู่
 class AdminShell extends StatefulWidget {
   const AdminShell({super.key});
 
@@ -16,6 +18,7 @@ class AdminShell extends StatefulWidget {
 }
 
 class _AdminShellState extends State<AdminShell> {
+  // index ใช้เลือกทั้งหัวข้อ AppBar, เนื้อหาหน้า และรายการใน Drawer
   int _index = 0;
   static const titles = [
     'ภาพรวมระบบ',
@@ -119,6 +122,7 @@ class _AdminShellState extends State<AdminShell> {
           ),
         ],
       ),
+      // รักษา state ของหน้าจัดการแต่ละหน้าไว้เมื่อสลับเมนูใน Drawer
       body: IndexedStack(index: _index, children: pages),
     );
   }

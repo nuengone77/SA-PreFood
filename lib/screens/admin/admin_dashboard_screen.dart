@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
+/// Dashboard ภาพรวมสำหรับ Admin แสดงตัวเลขหลัก กิจกรรม และสุขภาพระบบ
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
 
@@ -153,6 +154,7 @@ class AdminDashboardScreen extends StatelessWidget {
   }
 }
 
+/// การ์ดตัวเลขสรุปที่ปรับจำนวนคอลัมน์ตามขนาดหน้าจอ
 class _AdminStat extends StatelessWidget {
   const _AdminStat({
     required this.width,
@@ -215,6 +217,7 @@ class _AdminStat extends StatelessWidget {
   );
 }
 
+/// รายการกิจกรรมล่าสุดหนึ่งเหตุการณ์
 class _Activity extends StatelessWidget {
   const _Activity({
     required this.icon,

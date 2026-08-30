@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'models/models.dart';
 
+/// ข้อมูลร้านค้าและเมนูตัวอย่างที่ใช้ในหน้าค้นหาร้านและจัดการเมนู
+/// ในระบบจริงข้อมูลชุดนี้จะถูกแทนที่ด้วยข้อมูลจาก API หรือฐานข้อมูล
 const mockShops = <Shop>[
   Shop(
     id: 's1',
@@ -138,6 +140,8 @@ const mockShops = <Shop>[
   ),
 ];
 
+/// สร้างรายการออเดอร์ใหม่ทุกครั้ง เพื่อไม่ให้การเปลี่ยนสถานะในหน้าร้านค้า
+/// ไปแก้ข้อมูลเริ่มต้นของหน้าจออื่น
 List<MockOrder> buildVendorOrders() => [
   MockOrder(
     id: '#A1042',
@@ -168,6 +172,7 @@ List<MockOrder> buildVendorOrders() => [
   ),
 ];
 
+/// ประวัติออเดอร์ตัวอย่างสำหรับหน้าประวัติของลูกค้า
 final customerHistory = <MockOrder>[
   MockOrder(
     id: '#A0998',

@@ -4,6 +4,8 @@ import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
+/// หน้าติดตามสถานะออเดอร์แบบจำลอง
+/// ปุ่มด้านล่างใช้เลื่อนสถานะเพื่อสาธิต flow โดยไม่ต้องมี backend
 class OrderStatusScreen extends StatefulWidget {
   const OrderStatusScreen({super.key, required this.order});
   final MockOrder order;
@@ -13,9 +15,11 @@ class OrderStatusScreen extends StatefulWidget {
 }
 
 class _OrderStatusScreenState extends State<OrderStatusScreen> {
+  // ลำดับสถานะที่ลูกค้าจะเห็น ตั้งแต่รอร้านจนถึงพร้อมรับ
   int _step = 0;
   final stages = [OrderStage.pending, OrderStage.cooking, OrderStage.ready];
 
+  /// เลื่อนไปสถานะถัดไปและป้องกันไม่ให้เกินสถานะสุดท้าย
   void _advance() {
     if (_step < stages.length - 1) setState(() => _step++);
   }
@@ -23,6 +27,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
   @override
   Widget build(BuildContext context) {
     final stage = stages[_step];
+    // ทำให้การ์ดสรุปด้านล่างใช้สถานะเดียวกับ timeline
     widget.order.stage = stage;
     return Scaffold(
       appBar: AppBar(

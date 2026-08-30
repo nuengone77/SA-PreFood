@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
+/// หน้าจัดการร้านค้า ให้ Admin อนุมัติ ระงับ หรือเปิดใช้งานร้าน
 class ManageVendorsScreen extends StatefulWidget {
   const ManageVendorsScreen({super.key});
 
@@ -11,6 +12,7 @@ class ManageVendorsScreen extends StatefulWidget {
 }
 
 class _ManageVendorsScreenState extends State<ManageVendorsScreen> {
+  // รายการ mutable แบบ local เพื่อให้สถานะเปลี่ยนทันทีเมื่อเลือกคำสั่ง
   final vendors = <_VendorRecord>[
     _VendorRecord('ข้าวมันไก่คุณยาย', 'อาหารจานเดียว', '🍗', 'รออนุมัติ'),
     _VendorRecord('ครัวป้าแดง', 'อาหารตามสั่ง', '🍳', 'เปิดใช้งาน'),
@@ -132,6 +134,7 @@ class _ManageVendorsScreenState extends State<ManageVendorsScreen> {
   }
 }
 
+/// โมเดลภายในหน้าจอสำหรับเก็บสถานะร้านที่แก้ไขได้ใน prototype
 class _VendorRecord {
   _VendorRecord(this.name, this.category, this.emoji, this.status);
   final String name;

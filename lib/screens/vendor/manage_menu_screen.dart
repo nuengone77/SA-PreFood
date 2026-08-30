@@ -6,6 +6,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 import 'menu_form_screen.dart';
 
+/// หน้าจัดการเมนูของร้านค้า รองรับเพิ่ม แก้ไข ลบ และเปิด/ปิดขาย
 class ManageMenuScreen extends StatefulWidget {
   const ManageMenuScreen({super.key});
 
@@ -14,8 +15,10 @@ class ManageMenuScreen extends StatefulWidget {
 }
 
 class _ManageMenuScreenState extends State<ManageMenuScreen> {
+  // ทำสำเนา mock menu เพื่อให้แก้ไขได้โดยไม่เปลี่ยนค่าต้นฉบับ
   late final List<FoodItem> _items = [...mockShops.first.menu];
 
+  /// เปิดฟอร์มในโหมดเพิ่มหรือแก้ไข แล้วรับ FoodItem ที่บันทึกกลับมา
   Future<void> _openForm([FoodItem? item]) async {
     final result = await Navigator.push<FoodItem>(
       context,

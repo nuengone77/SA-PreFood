@@ -4,6 +4,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 import '../auth/splash_screen.dart';
 
+/// หน้าโปรไฟล์ลูกค้า แสดงข้อมูลบัญชีและเมนูตั้งค่าตัวอย่าง
 class CustomerProfileScreen extends StatelessWidget {
   const CustomerProfileScreen({super.key});
 
@@ -124,6 +125,7 @@ class CustomerProfileScreen extends StatelessWidget {
   }
 }
 
+/// ListTile รูปแบบกลางสำหรับเมนูย่อยภายในหน้าโปรไฟล์
 class _ProfileTile extends StatelessWidget {
   const _ProfileTile({
     required this.icon,

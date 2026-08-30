@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// ประเภทบัญชีที่ระบบรองรับ ใช้ตัดสินใจว่าจะเปิด flow ใดหลัง Login
 enum AppRole { customer, vendor, admin }
 
+/// เพิ่ม label ภาษาไทยและ icon ให้ค่าใน [AppRole]
 extension AppRoleLabel on AppRole {
   String get label => switch (this) {
     AppRole.customer => 'ลูกค้า',
@@ -16,6 +18,8 @@ extension AppRoleLabel on AppRole {
   };
 }
 
+/// โมเดลเมนูอาหารหนึ่งรายการ
+/// เก็บข้อมูลที่จำเป็นต่อการแสดงผลและคำนวณราคาในตะกร้า
 class FoodItem {
   const FoodItem({
     required this.id,
@@ -37,6 +41,8 @@ class FoodItem {
   final Color color;
   final bool isAvailable;
 
+  /// สร้างข้อมูลรายการใหม่โดยเปลี่ยนเฉพาะสถานะเปิดขาย
+  /// ใช้ในหน้าจัดการเมนูของร้านค้า
   FoodItem copyWith({bool? isAvailable}) => FoodItem(
     id: id,
     name: name,
@@ -49,6 +55,7 @@ class FoodItem {
   );
 }
 
+/// โมเดลร้านค้า ประกอบด้วยข้อมูลหน้าร้านและรายการอาหารของร้านนั้น
 class Shop {
   const Shop({
     required this.id,
@@ -75,8 +82,10 @@ class Shop {
   final List<FoodItem> menu;
 }
 
+/// สถานะทั้งหมดที่ออเดอร์สามารถอยู่ได้ใน prototype
 enum OrderStage { pending, cooking, ready, completed, rejected }
 
+/// แปลงสถานะออเดอร์ให้เป็นข้อความและสีสำหรับแสดงบน UI
 extension OrderStageInfo on OrderStage {
   String get label => switch (this) {
     OrderStage.pending => 'รอร้านรับออเดอร์',
@@ -94,6 +103,8 @@ extension OrderStageInfo on OrderStage {
   };
 }
 
+/// โมเดลออเดอร์แบบย่อ ใช้ร่วมกันในหน้าลูกค้า ร้านค้า และประวัติ
+/// ฟิลด์ [stage] แก้ไขได้เพื่อจำลองการอัปเดตสถานะแบบไม่ใช้ backend
 class MockOrder {
   MockOrder({
     required this.id,

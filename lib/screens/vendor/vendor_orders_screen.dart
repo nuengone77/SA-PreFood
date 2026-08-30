@@ -4,6 +4,7 @@ import '../../mock_data.dart';
 import '../../models/models.dart';
 import '../../widgets/common_widgets.dart';
 
+/// หน้าคิวออเดอร์ของร้านค้า รองรับการกรองและเปลี่ยนสถานะออเดอร์
 class VendorOrdersScreen extends StatefulWidget {
   const VendorOrdersScreen({super.key});
 
@@ -12,6 +13,7 @@ class VendorOrdersScreen extends StatefulWidget {
 }
 
 class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
+  // สร้างสำเนาออเดอร์สำหรับหน้านี้ และเก็บตัวกรองที่ผู้ใช้เลือก
   late final List<MockOrder> _orders = buildVendorOrders();
   String _filter = 'ทั้งหมด';
 
@@ -73,6 +75,8 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
     );
   }
 
+  /// คืนชุดปุ่มที่เหมาะกับสถานะปัจจุบันของออเดอร์
+  /// เช่น ออเดอร์ใหม่มีปุ่มรับ/ปฏิเสธ ส่วนกำลังทำมีปุ่มทำเสร็จแล้ว
   List<Widget> _actionsFor(MockOrder order) {
     if (order.stage == OrderStage.pending) {
       return [

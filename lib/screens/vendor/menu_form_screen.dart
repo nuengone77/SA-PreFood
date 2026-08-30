@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../models/models.dart';
 
+/// ฟอร์มเดียวสำหรับทั้งเพิ่มและแก้ไขเมนู
+/// หาก [item] มีค่า ช่องต่างๆ จะถูกเติมด้วยข้อมูลเดิมโดยอัตโนมัติ
 class MenuFormScreen extends StatefulWidget {
   const MenuFormScreen({super.key, this.item});
   final FoodItem? item;
@@ -11,6 +13,7 @@ class MenuFormScreen extends StatefulWidget {
 }
 
 class _MenuFormScreenState extends State<MenuFormScreen> {
+  // Controller ทำให้ฟอร์มอ่านค่าและเติมข้อมูลเดิมในโหมดแก้ไขได้
   late final TextEditingController _name = TextEditingController(
     text: widget.item?.name ?? '',
   );
@@ -30,6 +33,7 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
 
   @override
   void dispose() {
+    // คืนทรัพยากรของ controller เมื่อปิดหน้า เพื่อป้องกัน memory leak
     _name.dispose();
     _price.dispose();
     _description.dispose();
@@ -122,6 +126,7 @@ class _MenuFormScreenState extends State<MenuFormScreen> {
               final name = _name.text.trim().isEmpty
                   ? 'เมนูใหม่'
                   : _name.text.trim();
+              // ส่ง FoodItem ที่สร้างจากฟอร์มกลับไปยัง ManageMenuScreen
               Navigator.pop(
                 context,
                 FoodItem(

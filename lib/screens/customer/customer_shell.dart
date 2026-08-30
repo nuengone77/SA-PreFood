@@ -8,6 +8,8 @@ import 'order_status_screen.dart';
 import 'profile_screen.dart';
 import 'shop_menu_screen.dart';
 
+/// โครงหน้าหลักของลูกค้า รับผิดชอบ Bottom Navigation และตะกร้าส่วนกลาง
+/// การเก็บตะกร้าไว้ที่ shell ทำให้ข้อมูลยังอยู่เมื่อสลับแท็บ
 class CustomerShell extends StatefulWidget {
   const CustomerShell({super.key});
 
@@ -16,11 +18,14 @@ class CustomerShell extends StatefulWidget {
 }
 
 class _CustomerShellState extends State<CustomerShell> {
+  // index ของแท็บปัจจุบัน และ map ที่จับคู่เมนูกับจำนวนในตะกร้า
   int _index = 0;
   final Map<FoodItem, int> _cart = {};
 
+  /// จำนวนสินค้ารวมทุกชิ้นสำหรับแสดง Badge ที่ไอคอนตะกร้า
   int get _cartCount => _cart.values.fold(0, (total, value) => total + value);
 
+  /// เปิดหน้าร้านและส่ง callback เพิ่มสินค้าเข้าตะกร้ากลับมายัง shell
   void _openShop(Shop shop) {
     Navigator.push(
       context,
@@ -40,6 +45,8 @@ class _CustomerShellState extends State<CustomerShell> {
     );
   }
 
+  /// รวมรายการและยอดเงินจากตะกร้าเป็นออเดอร์จำลอง
+  /// จากนั้นล้างตะกร้าและเปิดหน้าติดตามสถานะ
   void _checkout(String pickupTime) {
     final items = _cart.entries
         .map((e) => '${e.key.name} x${e.value}')
@@ -66,6 +73,7 @@ class _CustomerShellState extends State<CustomerShell> {
 
   @override
   Widget build(BuildContext context) {
+    // IndexedStack ช่วยรักษา state ของแต่ละหน้าไว้ขณะผู้ใช้สลับแท็บ
     final pages = [
       CustomerHomeScreen(onOpenShop: _openShop),
       const OrderHistoryScreen(),

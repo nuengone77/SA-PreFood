@@ -8,6 +8,8 @@ import '../customer/customer_shell.dart';
 import '../vendor/vendor_shell.dart';
 import 'register_screen.dart';
 
+/// หน้าเข้าสู่ระบบแบบ mock ให้เลือกบทบาทก่อนเข้าสู่หน้าหลัก
+/// ช่องอีเมลและรหัสผ่านมีไว้แสดง UX เท่านั้น จึงยังไม่ตรวจสอบข้อมูลจริง
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -16,9 +18,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // บทบาทที่เลือกและสถานะการซ่อน/แสดงรหัสผ่านบนหน้าจอ
   AppRole _role = AppRole.customer;
   bool _obscure = true;
 
+  /// เลือก shell ปลายทางตาม role แล้วล้างหน้า Auth ออกจาก navigation stack
+  /// เพื่อไม่ให้กด Back แล้วกลับมาหน้า Login หลังเข้าสู่ระบบ
   void _login() {
     final destination = switch (_role) {
       AppRole.customer => const CustomerShell(),
@@ -195,6 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// แสดง SnackBar แทนการทำงานจริงของฟีเจอร์ที่ยังเป็น prototype
   void _showDemoMessage(String message) {
     ScaffoldMessenger.of(
       context,

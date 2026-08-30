@@ -5,6 +5,7 @@ import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
+/// หน้าค้นหาร้านของลูกค้า รองรับการค้นหาด้วยข้อความและกรองหมวดหมู่
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key, required this.onOpenShop});
   final ValueChanged<Shop> onOpenShop;
@@ -14,6 +15,7 @@ class CustomerHomeScreen extends StatefulWidget {
 }
 
 class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
+  // ค่า filter ปัจจุบัน ใช้คำนวณรายการร้านใหม่ทุกครั้งที่ build
   String _category = 'ทั้งหมด';
   String _query = '';
   static const categories = [
@@ -26,6 +28,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // กรอง mock data ทั้งจากหมวดหมู่และคำค้นในขั้นตอนเดียว
     final shops = mockShops.where((shop) {
       final categoryMatches =
           _category == 'ทั้งหมด' || shop.category == _category;
@@ -185,6 +188,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 }
 
+/// การ์ดร้านค้าหนึ่งร้าน แสดงสถานะ คะแนน และเวลารอโดยประมาณ
 class _ShopCard extends StatelessWidget {
   const _ShopCard({required this.shop, required this.onTap});
   final Shop shop;

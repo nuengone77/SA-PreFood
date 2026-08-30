@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
 
+/// หน้าจัดการผู้ใช้ ให้ Admin เปิดใช้งานหรือระงับบัญชีตัวอย่าง
 class ManageUsersScreen extends StatefulWidget {
   const ManageUsersScreen({super.key});
 
@@ -10,6 +11,7 @@ class ManageUsersScreen extends StatefulWidget {
 }
 
 class _ManageUsersScreenState extends State<ManageUsersScreen> {
+  // รายการ local state สำหรับจำลองการเปลี่ยนสถานะโดยไม่ใช้ฐานข้อมูล
   final users = <_UserRecord>[
     _UserRecord('ธนกร ใจดี', 'thanakorn@university.ac.th', 'ลูกค้า', true),
     _UserRecord('มินตรา สุขใจ', 'mintra@university.ac.th', 'ลูกค้า', true),
@@ -87,6 +89,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   }
 }
 
+/// โมเดลผู้ใช้แบบย่อที่ใช้เฉพาะในหน้าจัดการผู้ใช้
 class _UserRecord {
   _UserRecord(this.name, this.email, this.role, this.active);
   final String name;

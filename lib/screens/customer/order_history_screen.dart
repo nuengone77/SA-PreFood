@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../mock_data.dart';
 import '../../widgets/common_widgets.dart';
 
+/// แสดงประวัติออเดอร์จาก mock data และปุ่มสั่งเมนูเดิมซ้ำ
 class OrderHistoryScreen extends StatelessWidget {
   const OrderHistoryScreen({super.key});
 

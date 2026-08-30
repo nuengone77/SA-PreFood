@@ -4,6 +4,8 @@ import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
+/// หน้าตะกร้าของลูกค้า รับข้อมูลและ callback จาก [CustomerShell]
+/// จึงมีหน้าที่แสดงผลและส่งคำสั่งกลับไปยังเจ้าของ state
 class CartScreen extends StatefulWidget {
   const CartScreen({
     super.key,
@@ -24,10 +26,12 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  // รอบรับอาหารที่ลูกค้าเลือก ค่าเริ่มต้นคือ 12:15
   String _pickup = '12:15';
 
   @override
   Widget build(BuildContext context) {
+    // แสดง Empty State และปุ่มกลับไปเลือกร้านเมื่อยังไม่มีสินค้า
     if (widget.cart.isEmpty) {
       return SafeArea(
         child: Column(
@@ -61,6 +65,7 @@ class _CartScreenState extends State<CartScreen> {
       );
     }
 
+    // คำนวณยอดรวมจากราคา x จำนวนของทุกรายการในตะกร้า
     final subtotal = widget.cart.entries.fold<double>(
       0,
       (sum, e) => sum + e.key.price * e.value,
@@ -203,6 +208,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 }
 
+/// แถวแสดงราคา ใช้ซ้ำกับค่าอาหาร ค่าบริการ และยอดรวม
 class _PriceRow extends StatelessWidget {
   const _PriceRow({
     required this.label,

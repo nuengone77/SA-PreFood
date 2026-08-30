@@ -4,6 +4,7 @@ import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
+/// แสดงข้อมูลร้านและเมนูทั้งหมด พร้อมปุ่มเพิ่มสินค้าลงตะกร้า
 class ShopMenuScreen extends StatefulWidget {
   const ShopMenuScreen({
     super.key,
@@ -22,6 +23,7 @@ class ShopMenuScreen extends StatefulWidget {
 }
 
 class _ShopMenuScreenState extends State<ShopMenuScreen> {
+  // สำเนาจำนวนสินค้าเพื่ออัปเดต Badge ภายในหน้านี้ทันที
   late int _cartCount;
 
   @override
@@ -161,6 +163,7 @@ class _ShopMenuScreenState extends State<ShopMenuScreen> {
                                   tooltip: 'เพิ่มลงตะกร้า',
                                   onPressed: item.isAvailable
                                       ? () {
+                                          // ส่งเมนูกลับให้ CustomerShell จัดเก็บ
                                           widget.onAdd(item);
                                           setState(() => _cartCount++);
                                           ScaffoldMessenger.of(

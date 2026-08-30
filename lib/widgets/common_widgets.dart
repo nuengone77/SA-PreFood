@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../theme/app_theme.dart';
 
+/// โลโก้ PreFood แบบสร้างจาก Material Icon จึงไม่ต้องพึ่งไฟล์รูปภายนอก
 class BrandMark extends StatelessWidget {
   const BrandMark({super.key, this.size = 74});
   final double size;
@@ -32,6 +33,7 @@ class BrandMark extends StatelessWidget {
   }
 }
 
+/// ส่วนหัวมาตรฐานของหน้า แสดงหัวข้อ คำอธิบาย และ widget ด้านขวาได้
 class PageIntro extends StatelessWidget {
   const PageIntro({
     super.key,
@@ -78,6 +80,7 @@ class PageIntro extends StatelessWidget {
   }
 }
 
+/// ภาพตัวอย่างอาหารหรือร้านค้า ใช้ emoji บนพื้นหลังไล่สีแทน asset จริง
 class EmojiVisual extends StatelessWidget {
   const EmojiVisual({
     super.key,
@@ -110,6 +113,7 @@ class EmojiVisual extends StatelessWidget {
   }
 }
 
+/// ป้ายสถานะขนาดเล็ก เช่น เปิดร้าน กำลังทำ หรือพร้อมรับ
 class StatusPill extends StatelessWidget {
   const StatusPill({super.key, required this.label, required this.color});
   final String label;
@@ -135,6 +139,7 @@ class StatusPill extends StatelessWidget {
   }
 }
 
+/// หน้าสถานะว่างสำหรับกรณีไม่มีข้อมูล เช่น ตะกร้าว่างหรือค้นหาไม่พบ
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
@@ -182,6 +187,8 @@ class EmptyState extends StatelessWidget {
   }
 }
 
+/// การ์ดสรุปข้อมูลออเดอร์ที่ใช้ซ้ำในหน้าประวัติและหน้าร้านค้า
+/// รับ [actions] เพื่อให้แต่ละหน้าส่งปุ่มคำสั่งที่ต่างกันเข้ามาได้
 class OrderSummaryCard extends StatelessWidget {
   const OrderSummaryCard({
     super.key,

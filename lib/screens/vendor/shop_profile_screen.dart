@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../auth/splash_screen.dart';
 
+/// หน้าโปรไฟล์ร้าน แสดงข้อมูลติดต่อ เวลาเปิดปิด และสถานะร้าน
 class ShopProfileScreen extends StatefulWidget {
   const ShopProfileScreen({super.key});
 
@@ -11,6 +12,7 @@ class ShopProfileScreen extends StatefulWidget {
 }
 
 class _ShopProfileScreenState extends State<ShopProfileScreen> {
+  // สถานะเปิดร้านแบบ local สำหรับสาธิตการใช้งาน Switch
   bool _isOpen = true;
 
   @override
@@ -112,6 +114,7 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
   }
 }
 
+/// กล่องควบคุมสถานะเปิด/ปิดร้านที่แสดงข้อความและ Switch คู่กัน
 class StatusButton extends StatelessWidget {
   const StatusButton({
     super.key,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
+/// Dashboard ร้านค้า แสดงสถิติประจำวัน ออเดอร์ใหม่ และกราฟอย่างง่าย
 class VendorDashboardScreen extends StatelessWidget {
   const VendorDashboardScreen({super.key, required this.onViewOrders});
   final VoidCallback onViewOrders;
@@ -155,6 +156,7 @@ class VendorDashboardScreen extends StatelessWidget {
   }
 }
 
+/// การ์ดสถิติขนาดเล็กที่ใช้กับตัวเลขสรุปแต่ละประเภท
 class _StatCard extends StatelessWidget {
   const _StatCard({
     required this.width,
@@ -217,6 +219,7 @@ class _StatCard extends StatelessWidget {
   );
 }
 
+/// แท่งกราฟรายชั่วโมงแบบไม่ใช้ chart package ภายนอก
 class _MiniBar extends StatelessWidget {
   const _MiniBar({required this.label, required this.value});
   final String label;

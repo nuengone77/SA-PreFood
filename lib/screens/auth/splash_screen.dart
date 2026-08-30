@@ -4,6 +4,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 import 'login_screen.dart';
 
+/// หน้าแรกของแอป ทำหน้าที่แนะนำ PreFood และพาผู้ใช้ไปหน้า Login
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 

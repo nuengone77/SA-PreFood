@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// ชุดสีส่วนกลางของแอป เพื่อให้ทุกหน้าจอใช้สีในแนวทางเดียวกัน
 abstract final class AppColors {
   static const orange = Color(0xFFF47C48);
   static const orangeDark = Color(0xFFD95C2B);
@@ -9,6 +10,8 @@ abstract final class AppColors {
   static const muted = Color(0xFF75817D);
 }
 
+/// สร้าง Material 3 theme และกำหนดรูปแบบ widget ที่ใช้ร่วมกันทั้งแอป
+/// เช่น AppBar, Card, ช่องกรอกข้อมูล, ปุ่ม และ NavigationBar
 abstract final class AppTheme {
   static ThemeData get light {
     final scheme = ColorScheme.fromSeed(

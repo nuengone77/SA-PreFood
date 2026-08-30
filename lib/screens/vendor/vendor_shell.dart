@@ -6,6 +6,7 @@ import 'manage_menu_screen.dart';
 import 'shop_profile_screen.dart';
 import 'vendor_orders_screen.dart';
 
+/// โครงหน้าหลักของร้านค้า จัดการ AppBar, Bottom Navigation และหน้าทั้ง 3 แท็บ
 class VendorShell extends StatefulWidget {
   const VendorShell({super.key});
 
@@ -14,10 +15,12 @@ class VendorShell extends StatefulWidget {
 }
 
 class _VendorShellState extends State<VendorShell> {
+  // index ของแท็บร้านค้าที่กำลังแสดง
   int _index = 0;
 
   @override
   Widget build(BuildContext context) {
+    // ส่ง callback ให้ Dashboard สามารถพาไปแท็บออเดอร์ได้โดยตรง
     final pages = [
       VendorDashboardScreen(onViewOrders: () => setState(() => _index = 1)),
       const VendorOrdersScreen(),
