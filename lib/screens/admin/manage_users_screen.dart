@@ -13,10 +13,10 @@ class ManageUsersScreen extends StatefulWidget {
 class _ManageUsersScreenState extends State<ManageUsersScreen> {
   // รายการ local state สำหรับจำลองการเปลี่ยนสถานะโดยไม่ใช้ฐานข้อมูล
   final users = <_UserRecord>[
-    _UserRecord('ธนกร ใจดี', 'thanakorn@university.ac.th', 'ลูกค้า', true),
-    _UserRecord('มินตรา สุขใจ', 'mintra@university.ac.th', 'ลูกค้า', true),
-    _UserRecord('สมชาย แสงดี', 'somchai@shop.co', 'ร้านค้า', true),
-    _UserRecord('บัญชีทดสอบ', 'demo@university.ac.th', 'ลูกค้า', false),
+    _UserRecord('ธนกร ใจดี', '@thanakorn • 67312345', 'ลูกค้า', true),
+    _UserRecord('มินตรา สุขใจ', '@mintra • 67318890', 'ลูกค้า', true),
+    _UserRecord('สมชาย แสงดี', '@somchai • 089-123-4567', 'ร้านค้า', true),
+    _UserRecord('บัญชีทดสอบ', '@demo • 67300000', 'ลูกค้า', false),
   ];
 
   @override
@@ -26,7 +26,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       children: [
         TextField(
           decoration: const InputDecoration(
-            hintText: 'ค้นหาชื่อหรืออีเมล',
+            hintText: 'ค้นหาชื่อ ชื่อผู้ใช้ หรือรหัสนิสิต',
             prefixIcon: Icon(Icons.search_rounded),
           ),
         ),
@@ -56,7 +56,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 3),
                   child: Text(
-                    '${user.email}\n${user.role}',
+                    '${user.account}\n${user.role}',
                     style: const TextStyle(
                       color: AppColors.muted,
                       fontSize: 12,
@@ -91,9 +91,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
 
 /// โมเดลผู้ใช้แบบย่อที่ใช้เฉพาะในหน้าจัดการผู้ใช้
 class _UserRecord {
-  _UserRecord(this.name, this.email, this.role, this.active);
+  _UserRecord(this.name, this.account, this.role, this.active);
   final String name;
-  final String email;
+  final String account;
   final String role;
   bool active;
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app_store.dart';
+import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -10,6 +12,17 @@ class VendorDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: appStore,
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
+    final orders = appStore.vendorOrders;
+    int count(OrderStage stage) => orders.where((o) => o.stage == stage).length;
+    final pending = orders.where((o) => o.stage == OrderStage.pending);
+    final isOpen = appStore.vendorShop.isOpen;
     return SafeArea(
       top: false,
       child: ListView(
@@ -18,7 +31,10 @@ class VendorDashboardScreen extends StatelessWidget {
           PageIntro(
             title: 'สวัสดีตอนเที่ยง 👋',
             subtitle: 'ภาพรวมร้านของคุณวันนี้',
-            trailing: StatusPill(label: 'ร้านเปิดอยู่', color: AppColors.green),
+            trailing: StatusPill(
+              label: isOpen ? 'ร้านเปิดอยู่' : 'ร้านปิดอยู่',
+              color: isOpen ? AppColors.green : AppColors.muted,
+            ),
           ),
           const SizedBox(height: 20),
           LayoutBuilder(
@@ -31,22 +47,22 @@ class VendorDashboardScreen extends StatelessWidget {
                   _StatCard(
                     width: width,
                     icon: Icons.fiber_new_rounded,
-                    label: 'ออเดอร์ใหม่',
-                    value: '1',
+                    label: 'รอยืนยัน',
+                    value: '${count(OrderStage.pending)}',
                     color: AppColors.orange,
                   ),
                   _StatCard(
                     width: width,
                     icon: Icons.soup_kitchen_rounded,
-                    label: 'กำลังทำ',
-                    value: '1',
+                    label: 'กำลังปรุงอาหาร',
+                    value: '${count(OrderStage.cooking)}',
                     color: const Color(0xFF4D83C4),
                   ),
                   _StatCard(
                     width: width,
                     icon: Icons.check_circle_rounded,
-                    label: 'เสร็จแล้ว',
-                    value: '18',
+                    label: 'สำเร็จ',
+                    value: '${18 + count(OrderStage.completed)}',
                     color: AppColors.green,
                   ),
                   _StatCard(
@@ -60,53 +76,55 @@ class VendorDashboardScreen extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 22),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2F8064), Color(0xFF49A07F)],
-              ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'มีออเดอร์ใหม่เข้ามา!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '#A1042 • รับเวลา 12:15',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: .82),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      FilledButton.tonal(
-                        onPressed: onViewOrders,
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size(130, 42),
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppColors.green,
-                        ),
-                        child: const Text('ดูออเดอร์'),
-                      ),
-                    ],
-                  ),
+          if (pending.isNotEmpty) ...[
+            const SizedBox(height: 22),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF2F8064), Color(0xFF49A07F)],
                 ),
-                const Text('🧾', style: TextStyle(fontSize: 62)),
-              ],
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'มีออเดอร์ใหม่เข้ามา!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '${pending.first.id} • นัดรับ ${formatDateTime(pending.first.pickupAt)}',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: .82),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        FilledButton.tonal(
+                          onPressed: onViewOrders,
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(130, 42),
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.green,
+                          ),
+                          child: const Text('ดูออเดอร์'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Text('🧾', style: TextStyle(fontSize: 62)),
+                ],
+              ),
             ),
-          ),
+          ],
           const SizedBox(height: 24),
           Text(
             'ช่วงเวลาขายดี',

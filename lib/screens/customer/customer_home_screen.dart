@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../mock_data.dart';
+import '../../app_store.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
@@ -28,14 +28,31 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // กรอง mock data ทั้งจากหมวดหมู่และคำค้นในขั้นตอนเดียว
-    final shops = mockShops.where((shop) {
+    return ListenableBuilder(
+      listenable: appStore,
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  /// เมนูของร้านที่ชื่อตรงกับคำค้น ใช้แสดงใต้การ์ดร้าน
+  List<FoodItem> _matchedMenu(Shop shop) {
+    if (_query.isEmpty) return const [];
+    final query = _query.toLowerCase();
+    return shop.menu
+        .where((item) => item.name.toLowerCase().contains(query))
+        .toList();
+  }
+
+  Widget _build(BuildContext context) {
+    // กรองร้านจากหมวดหมู่ และคำค้นที่ตรงกับชื่อร้าน ประเภทอาหาร หรือชื่อเมนู
+    final shops = appStore.shops.where((shop) {
       final categoryMatches =
           _category == 'ทั้งหมด' || shop.category == _category;
       final queryMatches =
           _query.isEmpty ||
           shop.name.toLowerCase().contains(_query.toLowerCase()) ||
-          shop.category.contains(_query);
+          shop.category.contains(_query) ||
+          _matchedMenu(shop).isNotEmpty;
       return categoryMatches && queryMatches;
     }).toList();
 
@@ -103,7 +120,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 TextField(
                   onChanged: (value) => setState(() => _query = value),
                   decoration: const InputDecoration(
-                    hintText: 'ค้นหาร้านหรือประเภทอาหาร',
+                    hintText: 'ค้นหาร้าน เมนู หรือประเภทอาหาร',
                     prefixIcon: Icon(Icons.search_rounded),
                     suffixIcon: Icon(Icons.tune_rounded),
                   ),
@@ -174,6 +191,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (_, index) => _ShopCard(
                         shop: shops[index],
+                        matchedMenu: _matchedMenu(shops[index]),
                         onTap: () => widget.onOpenShop(shops[index]),
                       ),
                       childCount: shops.length,
@@ -190,8 +208,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
 /// การ์ดร้านค้าหนึ่งร้าน แสดงสถานะ คะแนน และเวลารอโดยประมาณ
 class _ShopCard extends StatelessWidget {
-  const _ShopCard({required this.shop, required this.onTap});
+  const _ShopCard({
+    required this.shop,
+    required this.onTap,
+    this.matchedMenu = const [],
+  });
   final Shop shop;
+
+  /// เมนูที่ตรงกับคำค้น ถ้ามีจะแสดงแทนคำอธิบายร้าน
+  final List<FoodItem> matchedMenu;
   final VoidCallback onTap;
 
   @override
@@ -247,7 +272,9 @@ class _ShopCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      shop.description,
+                      matchedMenu.isEmpty
+                          ? shop.description
+                          : 'พบเมนู: ${matchedMenu.map((e) => e.name).join(', ')}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

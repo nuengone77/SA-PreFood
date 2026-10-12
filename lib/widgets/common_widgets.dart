@@ -194,9 +194,13 @@ class OrderSummaryCard extends StatelessWidget {
     super.key,
     required this.order,
     this.actions = const [],
+    this.showCustomer = false,
   });
   final MockOrder order;
   final List<Widget> actions;
+
+  /// true ในหน้าร้านค้า เพื่อแสดงชื่อลูกค้าแทนชื่อร้าน
+  final bool showCustomer;
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +214,7 @@ class OrderSummaryCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    order.id,
+                    '${order.id} • คิว ${order.queueLabel}',
                     style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 16,
@@ -222,11 +226,28 @@ class OrderSummaryCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              order.shopName,
+              showCustomer ? 'ลูกค้า: ${order.customerName}' : order.shopName,
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 4),
             Text(order.items, style: const TextStyle(color: AppColors.muted)),
+            if (order.pointsUsed > 0 || order.pointsEarned > 0) ...[
+              const SizedBox(height: 4),
+              Text(
+                [
+                  if (order.pointsUsed > 0)
+                    'ใช้ ${order.pointsUsed} แต้ม ลด ฿${order.discount.toStringAsFixed(0)}',
+                  if (order.pointsEarned > 0)
+                    'ได้รับ ${order.pointsEarned} แต้ม',
+                ].join(' • '),
+                style: const TextStyle(color: AppColors.green, fontSize: 12),
+              ),
+            ],
+            const SizedBox(height: 4),
+            Text(
+              'สั่งเมื่อ ${formatDateTime(order.orderedAt)} • ${order.paymentMethod.label}',
+              style: const TextStyle(color: AppColors.muted, fontSize: 12),
+            ),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Divider(height: 1),
@@ -239,11 +260,12 @@ class OrderSummaryCard extends StatelessWidget {
                   color: AppColors.muted,
                 ),
                 const SizedBox(width: 6),
-                Text(
-                  order.pickupTime,
-                  style: const TextStyle(color: AppColors.muted),
+                Expanded(
+                  child: Text(
+                    'นัดรับ ${formatDateTime(order.pickupAt)}',
+                    style: const TextStyle(color: AppColors.muted),
+                  ),
                 ),
-                const Spacer(),
                 Text(
                   '฿${order.total.toStringAsFixed(0)}',
                   style: const TextStyle(
@@ -273,4 +295,16 @@ class OrderSummaryCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// ตรวจช่องที่รายงานกำหนดว่า "บังคับ" ต้องไม่ว่าง
+String? requiredField(String? value) =>
+    (value == null || value.trim().isEmpty) ? 'กรุณากรอกข้อมูล' : null;
+
+/// ตรวจเบอร์โทรศัพท์ไทย 9-10 หลัก (อนุญาตให้มีขีดคั่น)
+String? phoneField(String? value) {
+  final digits = (value ?? '').replaceAll(RegExp(r'[^0-9]'), '');
+  if (digits.isEmpty) return 'กรุณากรอกเบอร์โทรศัพท์';
+  if (digits.length < 9 || digits.length > 10) return 'เบอร์โทรศัพท์ไม่ถูกต้อง';
+  return null;
 }

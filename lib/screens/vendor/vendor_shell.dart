@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../app_store.dart';
+import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import 'dashboard_screen.dart';
 import 'manage_menu_screen.dart';
+import 'sales_report_screen.dart';
 import 'shop_profile_screen.dart';
 import 'vendor_orders_screen.dart';
 
-/// โครงหน้าหลักของร้านค้า จัดการ AppBar, Bottom Navigation และหน้าทั้ง 3 แท็บ
+/// โครงหน้าหลักของร้านค้า จัดการ AppBar, Bottom Navigation และหน้าทั้ง 4 แท็บ
 class VendorShell extends StatefulWidget {
   const VendorShell({super.key});
 
@@ -20,12 +23,24 @@ class _VendorShellState extends State<VendorShell> {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: appStore,
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
     // ส่ง callback ให้ Dashboard สามารถพาไปแท็บออเดอร์ได้โดยตรง
     final pages = [
       VendorDashboardScreen(onViewOrders: () => setState(() => _index = 1)),
       const VendorOrdersScreen(),
       const ManageMenuScreen(),
+      const SalesReportScreen(),
     ];
+    // จำนวนออเดอร์ที่รอยืนยัน ใช้แสดง Badge บนแท็บออเดอร์
+    final pending = appStore.vendorOrders
+        .where((order) => order.stage == OrderStage.pending)
+        .length;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -78,27 +93,34 @@ class _VendorShellState extends State<VendorShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (value) => setState(() => _index = value),
-        destinations: const [
-          NavigationDestination(
+        destinations: [
+          const NavigationDestination(
             icon: Icon(Icons.space_dashboard_outlined),
             selectedIcon: Icon(Icons.space_dashboard_rounded),
             label: 'แดชบอร์ด',
           ),
           NavigationDestination(
             icon: Badge(
-              label: Text('1'),
-              child: Icon(Icons.receipt_long_outlined),
+              isLabelVisible: pending > 0,
+              label: Text('$pending'),
+              child: const Icon(Icons.receipt_long_outlined),
             ),
             selectedIcon: Badge(
-              label: Text('1'),
-              child: Icon(Icons.receipt_long_rounded),
+              isLabelVisible: pending > 0,
+              label: Text('$pending'),
+              child: const Icon(Icons.receipt_long_rounded),
             ),
             label: 'ออเดอร์',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.restaurant_menu_outlined),
             selectedIcon: Icon(Icons.restaurant_menu_rounded),
             label: 'เมนู',
+          ),
+          const NavigationDestination(
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart_rounded),
+            label: 'รายงาน',
           ),
         ],
       ),

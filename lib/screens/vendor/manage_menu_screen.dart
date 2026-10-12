@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../mock_data.dart';
+import '../../app_store.dart';
 import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 import 'menu_form_screen.dart';
 
-/// หน้าจัดการเมนูของร้านค้า รองรับเพิ่ม แก้ไข ลบ และเปิด/ปิดขาย
+/// หน้าจัดการเมนูของร้านค้า รองรับเพิ่ม แก้ไข ลบ และตั้งสถานะวัตถุดิบ (มีสินค้า/สินค้าหมด)
+/// บันทึกลง [appStore] ฝั่งลูกค้าจึงเห็นสถานะสินค้าหมดทันที
 class ManageMenuScreen extends StatefulWidget {
   const ManageMenuScreen({super.key});
 
@@ -15,27 +16,28 @@ class ManageMenuScreen extends StatefulWidget {
 }
 
 class _ManageMenuScreenState extends State<ManageMenuScreen> {
-  // ทำสำเนา mock menu เพื่อให้แก้ไขได้โดยไม่เปลี่ยนค่าต้นฉบับ
-  late final List<FoodItem> _items = [...mockShops.first.menu];
+  static const _shopId = AppStore.vendorShopId;
 
-  /// เปิดฟอร์มในโหมดเพิ่มหรือแก้ไข แล้วรับ FoodItem ที่บันทึกกลับมา
+  /// เปิดฟอร์มในโหมดเพิ่มหรือแก้ไข แล้วบันทึก FoodItem ที่ได้กลับมา
   Future<void> _openForm([FoodItem? item]) async {
     final result = await Navigator.push<FoodItem>(
       context,
       MaterialPageRoute(builder: (_) => MenuFormScreen(item: item)),
     );
     if (result == null) return;
-    setState(() {
-      if (item == null) {
-        _items.add(result);
-      } else {
-        _items[_items.indexOf(item)] = result;
-      }
-    });
+    appStore.saveMenuItem(_shopId, result);
   }
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: appStore,
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
+    final items = appStore.vendorShop.menu;
     return SafeArea(
       top: false,
       child: ListView(
@@ -44,7 +46,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
           PageIntro(
             title: 'จัดการเมนู',
             subtitle:
-                '${_items.where((item) => item.isAvailable).length} เมนูพร้อมขาย',
+                '${items.where((item) => item.isAvailable).length}/${items.length} เมนูมีสินค้า',
             trailing: IconButton.filled(
               onPressed: () => _openForm(),
               icon: const Icon(Icons.add_rounded),
@@ -52,7 +54,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          ..._items.map(
+          ...items.map(
             (item) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Card(
@@ -88,20 +90,20 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                             Row(
                               children: [
                                 Text(
-                                  item.isAvailable ? 'เปิดขาย' : 'ปิดขาย',
+                                  item.stockLabel,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: item.isAvailable
                                         ? AppColors.green
-                                        : AppColors.muted,
+                                        : Colors.red.shade500,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 Switch(
                                   value: item.isAvailable,
-                                  onChanged: (value) => setState(
-                                    () => _items[_items.indexOf(item)] = item
-                                        .copyWith(isAvailable: value),
+                                  onChanged: (value) => appStore.saveMenuItem(
+                                    _shopId,
+                                    item.copyWith(isAvailable: value),
                                   ),
                                 ),
                               ],
@@ -115,7 +117,7 @@ class _ManageMenuScreenState extends State<ManageMenuScreen> {
                             _openForm(item);
                           }
                           if (value == 'delete') {
-                            setState(() => _items.remove(item));
+                            appStore.deleteMenuItem(_shopId, item);
                           }
                         },
                         itemBuilder: (_) => const [

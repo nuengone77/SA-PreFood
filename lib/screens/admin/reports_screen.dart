@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 
 /// หน้ารายงาน แสดงยอดขาย กราฟแท่ง และอันดับร้านค้าจากข้อมูลจำลอง
@@ -71,6 +72,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'รายได้ค่าธรรมเนียม PreFood (${PlatformConfig.feePercent}%): '
+                  '${formatBaht(PlatformConfig.feeFor(_period == '7 วัน' ? 42580 : 168420))}',
+                  key: const Key('admin-fee-revenue'),
+                  style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 24),
                 SizedBox(

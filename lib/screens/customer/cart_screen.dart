@@ -10,24 +10,60 @@ class CartScreen extends StatefulWidget {
   const CartScreen({
     super.key,
     required this.cart,
+    required this.shop,
     required this.onAdd,
     required this.onRemove,
     required this.onBrowse,
     required this.onCheckout,
   });
-  final Map<FoodItem, int> cart;
-  final ValueChanged<FoodItem> onAdd;
-  final ValueChanged<FoodItem> onRemove;
+  final List<CartLine> cart;
+  final Shop? shop;
+  final ValueChanged<CartLine> onAdd;
+  final ValueChanged<CartLine> onRemove;
   final VoidCallback onBrowse;
-  final ValueChanged<String> onCheckout;
+  final ValueChanged<DateTime> onCheckout;
 
   @override
   State<CartScreen> createState() => _CartScreenState();
 }
 
 class _CartScreenState extends State<CartScreen> {
-  // รอบรับอาหารที่ลูกค้าเลือก ค่าเริ่มต้นคือ 12:15
-  String _pickup = '12:15';
+  // รอบรับอาหารทุก 30 นาทีตามเวลาเปิดโรงอาหาร 08:00–16:30
+  static final _slots = [
+    for (var minutes = 8 * 60; minutes <= 16 * 60; minutes += 30)
+      Duration(minutes: minutes),
+  ];
+
+  // วันที่และรอบรับอาหารที่ลูกค้าเลือก
+  late DateTime _date = _availableDates().first;
+  Duration? _slot;
+
+  /// สั่งล่วงหน้าได้ 3 วัน ถ้าวันนี้ไม่เหลือรอบแล้วจะเริ่มจากพรุ่งนี้
+  List<DateTime> _availableDates() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return [
+      for (var i = 0; i < 4; i++) today.add(Duration(days: i)),
+    ].where((date) => _slotsFor(date).isNotEmpty).take(3).toList();
+  }
+
+  /// รอบที่เลือกได้ ต้องห่างจากเวลาปัจจุบันอย่างน้อย 15 นาทีให้ร้านเตรียมทัน
+  List<Duration> _slotsFor(DateTime date) {
+    final earliest = DateTime.now().add(const Duration(minutes: 15));
+    return _slots.where((slot) => date.add(slot).isAfter(earliest)).toList();
+  }
+
+  String _dateLabel(DateTime date) {
+    final today = DateTime.now();
+    if (date.day == today.day && date.month == today.month) {
+      return 'วันนี้ ${formatThaiDate(date)}';
+    }
+    final tomorrow = today.add(const Duration(days: 1));
+    if (date.day == tomorrow.day && date.month == tomorrow.month) {
+      return 'พรุ่งนี้ ${formatThaiDate(date)}';
+    }
+    return formatThaiDate(date);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,21 +102,24 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     // คำนวณยอดรวมจากราคา x จำนวนของทุกรายการในตะกร้า
-    final subtotal = widget.cart.entries.fold<double>(
+    final subtotal = widget.cart.fold<double>(
       0,
-      (sum, e) => sum + e.key.price * e.value,
+      (sum, line) => sum + line.subtotal,
     );
+    final slots = _slotsFor(_date);
+    final slot = slots.contains(_slot) ? _slot! : slots.first;
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
         children: [
           PageIntro(
             title: 'ตะกร้าของฉัน',
-            subtitle: '${widget.cart.length} เมนู • ครัวป้าแดง',
+            subtitle:
+                '${widget.cart.length} รายการ • ${widget.shop?.name ?? ''}',
           ),
           const SizedBox(height: 20),
-          ...widget.cart.entries.map(
-            (entry) => Padding(
+          ...widget.cart.map(
+            (line) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Card(
                 child: Padding(
@@ -88,8 +127,8 @@ class _CartScreenState extends State<CartScreen> {
                   child: Row(
                     children: [
                       EmojiVisual(
-                        emoji: entry.key.emoji,
-                        color: entry.key.color,
+                        emoji: line.item.emoji,
+                        color: line.item.color,
                         height: 76,
                         width: 76,
                       ),
@@ -99,15 +138,25 @@ class _CartScreenState extends State<CartScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              entry.key.name,
+                              line.item.name,
                               maxLines: 2,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
+                            if (line.note.isNotEmpty) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                'หมายเหตุ: ${line.note}',
+                                style: const TextStyle(
+                                  color: AppColors.muted,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 7),
                             Text(
-                              '฿${entry.key.price.toStringAsFixed(0)}',
+                              '฿${line.subtotal.toStringAsFixed(0)}',
                               style: const TextStyle(
                                 color: AppColors.orangeDark,
                                 fontWeight: FontWeight.w800,
@@ -126,21 +175,21 @@ class _CartScreenState extends State<CartScreen> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                widget.onRemove(entry.key);
+                                widget.onRemove(line);
                                 setState(() {});
                               },
                               icon: const Icon(Icons.remove_rounded),
                               visualDensity: VisualDensity.compact,
                             ),
                             Text(
-                              '${entry.value}',
+                              '${line.quantity}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
                             IconButton(
                               onPressed: () {
-                                widget.onAdd(entry.key);
+                                widget.onAdd(line);
                                 setState(() {});
                               },
                               icon: const Icon(Icons.add_rounded),
@@ -157,7 +206,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            'เลือกรอบรับอาหาร',
+            'วันและเวลานัดรับอาหาร',
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
@@ -165,12 +214,27 @@ class _CartScreenState extends State<CartScreen> {
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
-            children: ['12:15', '12:30', '12:45', '13:00']
+            children: _availableDates()
+                .map(
+                  (date) => ChoiceChip(
+                    avatar: const Icon(Icons.event_rounded, size: 18),
+                    label: Text(_dateLabel(date)),
+                    selected: date == _date,
+                    onSelected: (_) => setState(() => _date = date),
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: slots
                 .map(
                   (time) => ChoiceChip(
-                    label: Text(time),
-                    selected: time == _pickup,
-                    onSelected: (_) => setState(() => _pickup = time),
+                    label: Text(formatTime(_date.add(time))),
+                    selected: time == slot,
+                    onSelected: (_) => setState(() => _slot = time),
                   ),
                 )
                 .toList(),
@@ -197,9 +261,10 @@ class _CartScreenState extends State<CartScreen> {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () => widget.onCheckout(_pickup),
-              icon: const Icon(Icons.check_circle_outline_rounded),
-              label: Text('ยืนยันสั่งซื้อ • ฿${subtotal.toStringAsFixed(0)}'),
+              key: const Key('cart-checkout'),
+              onPressed: () => widget.onCheckout(_date.add(slot)),
+              icon: const Icon(Icons.payments_outlined),
+              label: Text('ไปชำระเงิน • ฿${subtotal.toStringAsFixed(0)}'),
             ),
           ),
         ],

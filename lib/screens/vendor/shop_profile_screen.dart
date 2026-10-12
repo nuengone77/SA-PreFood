@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app_store.dart';
+import '../../models/models.dart';
 import '../../theme/app_theme.dart';
 import '../auth/splash_screen.dart';
 
@@ -12,11 +14,16 @@ class ShopProfileScreen extends StatefulWidget {
 }
 
 class _ShopProfileScreenState extends State<ShopProfileScreen> {
-  // สถานะเปิดร้านแบบ local สำหรับสาธิตการใช้งาน Switch
-  bool _isOpen = true;
-
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: appStore,
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
+    final shop = appStore.vendorShop;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -43,19 +50,22 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
                     child: const Text('🍳', style: TextStyle(fontSize: 48)),
                   ),
                   const SizedBox(height: 14),
-                  const Text(
-                    'ครัวป้าแดง',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                  Text(
+                    shop.name,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'อาหารตามสั่ง • โรงอาหารกลาง ล็อก A03',
-                    style: TextStyle(color: AppColors.muted),
+                  Text(
+                    '${shop.category} • ${shop.location}',
+                    style: const TextStyle(color: AppColors.muted),
                   ),
                   const SizedBox(height: 14),
                   StatusButton(
-                    isOpen: _isOpen,
-                    onChanged: (value) => setState(() => _isOpen = value),
+                    isOpen: shop.isOpen,
+                    onChanged: (value) => appStore.setShopOpen(shop.id, value),
                   ),
                 ],
               ),
@@ -64,8 +74,8 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
           const SizedBox(height: 16),
           Card(
             child: Column(
-              children: const [
-                ListTile(
+              children: [
+                const ListTile(
                   leading: Icon(
                     Icons.schedule_outlined,
                     color: AppColors.orange,
@@ -74,22 +84,46 @@ class _ShopProfileScreenState extends State<ShopProfileScreen> {
                   subtitle: Text('จันทร์-ศุกร์ 08:00–16:30'),
                   trailing: Icon(Icons.chevron_right_rounded),
                 ),
-                Divider(height: 1, indent: 60),
+                const Divider(height: 1, indent: 60),
                 ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.location_on_outlined,
                     color: AppColors.orange,
                   ),
-                  title: Text('ตำแหน่งร้าน'),
-                  subtitle: Text('โรงอาหารกลาง ล็อก A03'),
-                  trailing: Icon(Icons.chevron_right_rounded),
+                  title: const Text('ตำแหน่งร้าน'),
+                  subtitle: Text(shop.location),
+                  trailing: const Icon(Icons.chevron_right_rounded),
                 ),
-                Divider(height: 1, indent: 60),
+                const Divider(height: 1, indent: 60),
                 ListTile(
-                  leading: Icon(Icons.call_outlined, color: AppColors.orange),
-                  title: Text('เบอร์ติดต่อ'),
-                  subtitle: Text('089-123-4567'),
-                  trailing: Icon(Icons.chevron_right_rounded),
+                  leading: const Icon(
+                    Icons.call_outlined,
+                    color: AppColors.orange,
+                  ),
+                  title: const Text('เบอร์ติดต่อ'),
+                  subtitle: Text(shop.phone),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(
+                    Icons.account_balance_outlined,
+                    color: AppColors.orange,
+                  ),
+                  title: const Text('บัญชีรับเงินจาก PreFood'),
+                  subtitle: Text(
+                    '${shop.bankAccount}\n'
+                    'โอนยอดรวมรายเดือน ทุกวันที่ ${PlatformConfig.payoutDay} ของเดือนถัดไป '
+                    '(หักค่าธรรมเนียม ${PlatformConfig.feePercent}%)',
+                  ),
+                  isThreeLine: true,
+                  trailing: const Icon(Icons.chevron_right_rounded),
                 ),
               ],
             ),

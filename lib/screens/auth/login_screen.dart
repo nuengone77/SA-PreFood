@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const BrandMark(size: 64),
                   const SizedBox(height: 24),
                   Text(
-                    'ยินดีต้อนรับกลับ 👋',
+                    'จองอาหารต้อง PreFood',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                       color: AppColors.ink,
@@ -123,9 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   TextField(
                     key: const Key('login-email'),
-                    keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                      labelText: 'อีเมล หรือชื่อผู้ใช้',
+                      labelText: 'ชื่อผู้ใช้',
                       prefixIcon: Icon(Icons.alternate_email_rounded),
                     ),
                   ),

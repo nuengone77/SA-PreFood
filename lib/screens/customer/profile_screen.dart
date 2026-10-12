@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../app_store.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 import '../auth/splash_screen.dart';
+import 'edit_profile_screen.dart';
 
 /// หน้าโปรไฟล์ลูกค้า แสดงข้อมูลบัญชีและเมนูตั้งค่าตัวอย่าง
 class CustomerProfileScreen extends StatefulWidget {
@@ -13,9 +15,24 @@ class CustomerProfileScreen extends StatefulWidget {
 }
 
 class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
-    bool _notificationsEnabled = true;
+  // สถานะเปิด/ปิดการแจ้งเตือนในหน้าโปรไฟล์
+  bool _notificationsEnabled = true;
+
+  void _openEdit(BuildContext context) => Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+  );
+
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: appStore,
+      builder: (context, _) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
+    final profile = appStore.profile;
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
@@ -44,26 +61,30 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'ธนกร ใจดี',
-                          style: TextStyle(
+                          profile.fullName,
+                          style: const TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 19,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'thanakornj67@nu.ac.th',
-                          style: TextStyle(color: AppColors.muted),
+                          '@${profile.username}',
+                          style: const TextStyle(color: AppColors.muted),
                         ),
-                        SizedBox(height: 3),
                         Text(
-                          'ลูกค้า • นักศึกษา',
-                          style: TextStyle(
+                          'โทร ${profile.phone}',
+                          style: const TextStyle(color: AppColors.muted),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          'รหัสนิสิต/บุคลากร ${profile.studentStaffId}',
+                          style: const TextStyle(
                             color: AppColors.green,
                             fontWeight: FontWeight.w600,
                           ),
@@ -72,7 +93,9 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    key: const Key('edit-profile'),
+                    tooltip: 'แก้ไขข้อมูลส่วนตัว',
+                    onPressed: () => _openEdit(context),
                     icon: const Icon(Icons.edit_outlined),
                   ),
                 ],
@@ -80,13 +103,15 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          const PointsBalanceCard(),
+          const SizedBox(height: 16),
           Card(
             child: Column(
               children: [
                 _ProfileTile(
                   icon: Icons.badge_outlined,
                   title: 'ข้อมูลส่วนตัว',
-                  onTap: () {},
+                  onTap: () => _openEdit(context),
                 ),
                 const Divider(height: 1, indent: 60),
                 _ProfileTile(
@@ -94,16 +119,12 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                   title: 'การแจ้งเตือน',
                   trailing: Switch(
                     value: _notificationsEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        _notificationsEnabled = value;
-                      });
-                    }),
-                  onTap: () {
-                    setState(() {
-                      _notificationsEnabled = !_notificationsEnabled;
-                    });
-                  },
+                    onChanged: (value) =>
+                        setState(() => _notificationsEnabled = value),
+                  ),
+                  onTap: () => setState(
+                    () => _notificationsEnabled = !_notificationsEnabled,
+                  ),
                 ),
                 const Divider(height: 1, indent: 60),
                 _ProfileTile(
@@ -161,5 +182,52 @@ class _ProfileTile extends StatelessWidget {
     title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
     trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
     onTap: onTap,
+  );
+}
+
+/// การ์ดแสดงแต้มสะสมคงเหลือ ใช้ในหน้าโปรไฟล์และประวัติการสั่งซื้อ
+class PointsBalanceCard extends StatelessWidget {
+  const PointsBalanceCard({super.key});
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: appStore,
+    builder: (context, _) => Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFB33A), Color(0xFFF47C48)],
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.stars_rounded, color: Colors.white, size: 36),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('แต้มสะสม', style: TextStyle(color: Colors.white)),
+                Text(
+                  '${appStore.points} แต้ม',
+                  key: const Key('points-balance'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            'ทุก ฿${AppStore.bahtPerPoint} = 1 แต้ม\n1 แต้ม = ส่วนลด ฿1',
+            textAlign: TextAlign.right,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ],
+      ),
+    ),
   );
 }

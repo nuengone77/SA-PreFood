@@ -4,7 +4,7 @@ import '../../models/models.dart';
 import 'cart_screen.dart';
 import 'customer_home_screen.dart';
 import 'order_history_screen.dart';
-import 'order_status_screen.dart';
+import 'payment_screen.dart';
 import 'profile_screen.dart';
 import 'shop_menu_screen.dart';
 
@@ -18,12 +18,55 @@ class CustomerShell extends StatefulWidget {
 }
 
 class _CustomerShellState extends State<CustomerShell> {
-  // index ของแท็บปัจจุบัน และ map ที่จับคู่เมนูกับจำนวนในตะกร้า
+  // index ของแท็บปัจจุบัน รายการในตะกร้า และร้านเจ้าของตะกร้า
+  // หนึ่งออเดอร์สั่งได้จากร้านเดียว เพราะต้องจ่ายเงินเข้าบัญชีร้านนั้นโดยตรง
   int _index = 0;
-  final Map<FoodItem, int> _cart = {};
+  final List<CartLine> _cart = [];
+  Shop? _cartShop;
 
   /// จำนวนสินค้ารวมทุกชิ้นสำหรับแสดง Badge ที่ไอคอนตะกร้า
-  int get _cartCount => _cart.values.fold(0, (total, value) => total + value);
+  int get _cartCount => _cart.fold(0, (total, line) => total + line.quantity);
+
+  /// เพิ่มรายการลงตะกร้า ถ้าเป็นเมนูและหมายเหตุเดียวกันจะรวมจำนวนให้
+  /// ถ้าตะกร้ามีของจากร้านอื่นอยู่ จะถามก่อนล้างตะกร้า
+  Future<bool> _addToCart(Shop shop, CartLine line) async {
+    if (_cartShop != null && _cartShop!.id != shop.id && _cart.isNotEmpty) {
+      final replace = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('เริ่มตะกร้าใหม่?'),
+          content: Text(
+            'ตะกร้ามีเมนูจาก ${_cartShop!.name} อยู่ '
+            'หนึ่งออเดอร์สั่งได้จากร้านเดียว ต้องการล้างตะกร้าเดิมหรือไม่',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('ยกเลิก'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('ล้างตะกร้า'),
+            ),
+          ],
+        ),
+      );
+      if (replace != true) return false;
+      _cart.clear();
+    }
+    setState(() {
+      _cartShop = shop;
+      final existing = _cart
+          .where((e) => e.item.id == line.item.id && e.note == line.note)
+          .firstOrNull;
+      if (existing != null) {
+        existing.quantity += line.quantity;
+      } else {
+        _cart.add(line);
+      }
+    });
+    return true;
+  }
 
   /// เปิดหน้าร้านและส่ง callback เพิ่มสินค้าเข้าตะกร้ากลับมายัง shell
   void _openShop(Shop shop) {
@@ -31,11 +74,9 @@ class _CustomerShellState extends State<CustomerShell> {
       context,
       MaterialPageRoute(
         builder: (_) => ShopMenuScreen(
-          shop: shop,
-          cartCount: _cartCount,
-          onAdd: (item) {
-            setState(() => _cart[item] = (_cart[item] ?? 0) + 1);
-          },
+          shopId: shop.id,
+          cartCount: () => _cartCount,
+          onAdd: (line) => _addToCart(shop, line),
           onViewCart: () {
             Navigator.pop(context);
             setState(() => _index = 2);
@@ -45,30 +86,25 @@ class _CustomerShellState extends State<CustomerShell> {
     );
   }
 
-  /// รวมรายการและยอดเงินจากตะกร้าเป็นออเดอร์จำลอง
-  /// จากนั้นล้างตะกร้าและเปิดหน้าติดตามสถานะ
-  void _checkout(String pickupTime) {
-    final items = _cart.entries
-        .map((e) => '${e.key.name} x${e.value}')
-        .join(', ');
-    final total = _cart.entries.fold<double>(
-      0,
-      (sum, e) => sum + e.key.price * e.value,
-    );
-    final order = MockOrder(
-      id: '#A1043',
-      customerName: 'คุณ',
-      shopName: 'ครัวป้าแดง',
-      items: items,
-      total: total,
-      pickupTime: pickupTime,
-      stage: OrderStage.pending,
-    );
-    setState(() => _cart.clear());
-    Navigator.push(
+  /// ไปหน้าชำระเงิน เมื่อชำระและแนบสลิปเรียบร้อยจึงล้างตะกร้า
+  Future<void> _checkout(DateTime pickupAt) async {
+    final placed = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => OrderStatusScreen(order: order)),
+      MaterialPageRoute(
+        builder: (_) => PaymentScreen(
+          shop: _cartShop!,
+          lines: List.of(_cart),
+          pickupAt: pickupAt,
+        ),
+      ),
     );
+    if (placed == true) {
+      setState(() {
+        _cart.clear();
+        _cartShop = null;
+        _index = 1;
+      });
+    }
   }
 
   @override
@@ -79,13 +115,14 @@ class _CustomerShellState extends State<CustomerShell> {
       const OrderHistoryScreen(),
       CartScreen(
         cart: _cart,
-        onAdd: (item) => setState(() => _cart[item] = (_cart[item] ?? 0) + 1),
-        onRemove: (item) => setState(() {
-          final quantity = _cart[item] ?? 0;
-          if (quantity <= 1) {
-            _cart.remove(item);
+        shop: _cartShop,
+        onAdd: (line) => setState(() => line.quantity++),
+        onRemove: (line) => setState(() {
+          if (line.quantity <= 1) {
+            _cart.remove(line);
+            if (_cart.isEmpty) _cartShop = null;
           } else {
-            _cart[item] = quantity - 1;
+            line.quantity--;
           }
         }),
         onBrowse: () => setState(() => _index = 0),
@@ -111,6 +148,7 @@ class _CustomerShellState extends State<CustomerShell> {
             label: 'ประวัติ',
           ),
           NavigationDestination(
+            key: const Key('nav-cart'),
             icon: Badge(
               isLabelVisible: _cartCount > 0,
               label: Text('$_cartCount'),
